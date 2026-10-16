@@ -1,0 +1,95 @@
+{
+    "info":  {
+                 "name":  "GameCatalog API",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+                 "description":  "# GameCatalog API\n\nAPI REST desarrollada con **FastAPI** para gestionar un catálogo de videojuegos (almacenamiento en memoria).\n\n| | |\n|---|---|\n| **Variable** | `{{base_url}}` |\n| **Local** | `http://127.0.0.1:8000` |\n| **Vercel** | `https://gamecatalog-api.vercel.app` |\n| **Documentación Swagger** | `{{base_url}}/docs` |\n| **Interfaz web** | `{{base_url}}/ui/` |\n\n## 1. Modelo de datos\n\n| Campo | Tipo | Descripción |\n|---|---|---|\n| `id` | entero | Identificador único (lo genera la API; opcional en el POST) |\n| `nombre` | texto | Nombre del videojuego (1–100 caracteres) |\n| `genero` | texto | Género (1–50 caracteres) |\n| `plataforma` | texto | Plataforma disponible (1–50 caracteres) |\n| `precio` | decimal | Precio, mayor o igual a 0 |\n| `disponible` | booleano | Disponibilidad (por defecto `true`) |\n\nDatos iniciales: id 1 (The Legend of Zelda: Breath of the Wild), id 2 (God of War) e id 3 (Halo Infinite).\nAl reiniciar el servidor los datos vuelven a este estado.\n\n## 2. Endpoints\n\n| Método | Ruta | Descripción | Códigos |\n|---|---|---|---|\n| GET | `/videojuegos` | Lista todos los videojuegos | 200 |\n| GET | `/videojuegos/{id}` | Consulta uno por ID | 200, 404 |\n| POST | `/videojuegos` | Registra un videojuego nuevo | 201, 409, 422 |\n| PUT | `/videojuegos/{id}` | Actualiza un videojuego existente | 200, 404, 422 |\n| DELETE | `/videojuegos/{id}` | Elimina un videojuego | 204, 404 |\n\nEn POST y PUT usa **Body → raw → JSON** con el header `Content-Type: application/json`.\n\n## 3. Las cuatro consultas\n\n### GET: consultar\n\n- Todos: `GET {{base_url}}/videojuegos` → **200 OK**, lista JSON con 3 videojuegos.\n- Uno: `GET {{base_url}}/videojuegos/1` → **200 OK**, datos de Zelda (`\"id\": 1`).\n- No existe: `GET {{base_url}}/videojuegos/999` → **404 Not Found**:\n\n```json\n{\"detail\": \"No existe un videojuego con id 999\"}\n```\n\n### POST: registrar\n\n`POST {{base_url}}/videojuegos`\n\n```json\n{\n  \"nombre\": \"Hollow Knight\",\n  \"genero\": \"Metroidvania\",\n  \"plataforma\": \"PC\",\n  \"precio\": 14.99,\n  \"disponible\": true\n}\n```\n\nEsperado: **201 Created**\n\n```json\n{\"nombre\": \"Hollow Knight\", \"genero\": \"Metroidvania\", \"plataforma\": \"PC\", \"precio\": 14.99, \"disponible\": true, \"id\": 4}\n```\n\nErrores: enviar `\"id\": 1` → **409 Conflict** (ID duplicado); `\"precio\": -5` o un campo faltante → **422 Unprocessable Entity**.\n\n### PUT: actualizar\n\n`PUT {{base_url}}/videojuegos/4`\n\n```json\n{\n  \"nombre\": \"Hollow Knight\",\n  \"genero\": \"Metroidvania\",\n  \"plataforma\": \"Nintendo Switch\",\n  \"precio\": 9.99,\n  \"disponible\": false\n}\n```\n\nEsperado: **200 OK** con el videojuego actualizado (`\"id\": 4`, precio 9.99, `disponible` false). Con un ID inexistente → **404**.\nEl PUT reemplaza todos los campos, por lo que hay que enviarlos todos.\n\n### DELETE: eliminar\n\n`DELETE {{base_url}}/videojuegos/4` (sin body)\n\nEsperado: **204 No Content** (respuesta vacía). Repetirlo, o hacer `GET /videojuegos/4`, devuelve **404**.\n\n## 4. Flujo completo de demostración\n\nEjecuta las peticiones en este orden (la colección ya las trae):\n\n1. `GET /videojuegos` → 200, 3 elementos.\n2. `POST /videojuegos` (Hollow Knight) → 201, id 4.\n3. `GET /videojuegos/4` → 200, datos creados.\n4. `PUT /videojuegos/4` (precio 9.99, plataforma Switch) → 200.\n5. `GET /videojuegos/4` → 200, datos actualizados.\n6. `DELETE /videojuegos/4` → 204.\n7. `GET /videojuegos/4` → 404.\n\n\u003e Si repites el POST sin reiniciar el servidor, el ID será 5 y los pasos siguientes ya no coinciden. Reinicia el servidor para repetir la demostración.\n\n## 5. Códigos HTTP usados\n\n| Código | Significado | Cuándo ocurre |\n|---|---|---|\n| 200 | OK | GET y PUT correctos |\n| 201 | Created | POST correcto |\n| 204 | No Content | DELETE correcto |\n| 404 | Not Found | El ID no existe |\n| 409 | Conflict | ID duplicado en el POST |\n| 422 | Unprocessable Entity | Datos inválidos |\n\n## 6. Conceptos breves\n\n- **API REST**: forma de comunicar programas por HTTP. Cada recurso (videojuegos) tiene una URL y se manipula con métodos estándar; los datos viajan en JSON y cada respuesta lleva un código de estado.\n- **FastAPI**: framework de Python para crear APIs; valida datos con Pydantic y genera documentación automática en `/docs`. **Uvicorn** es el servidor que lo ejecuta.\n- **GET** lee datos. **POST** crea un recurso. **PUT** reemplaza un recurso existente. **DELETE** lo elimina.\n\n## 7. Ejecución local (Windows, PowerShell)\n\n```powershell\ncd C:\\Users\\PC\\Desktop\\ING.SOF2\\GameCatalog\npython -m venv venv\n.\\venv\\Scripts\\Activate.ps1\npip install -r requirements.txt\nuvicorn app.main:app --reload\n```\n\nComprobar: `http://127.0.0.1:8000/` debe responder `{\"mensaje\":\"GameCatalog API funcionando\",\"docs\":\"/docs\"}`.\n"
+             },
+    "variable":  [
+                     {
+                         "key":  "base_url",
+                         "value":  "http://127.0.0.1:8000"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "1. GET todos (200)",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/videojuegos",
+                                     "description":  "Lista todos los videojuegos. Esperado: **200 OK** con un arreglo JSON."
+                                 }
+                 },
+                 {
+                     "name":  "2. GET uno por ID (200)",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/videojuegos/1",
+                                     "description":  "Consulta un videojuego por ID. Esperado: **200 OK**."
+                                 }
+                 },
+                 {
+                     "name":  "3. GET inexistente (404)",
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/videojuegos/999",
+                                     "description":  "ID que no existe. Esperado: **404 Not Found** con `{\"detail\": \"No existe un videojuego con id 999\"}`."
+                                 }
+                 },
+                 {
+                     "name":  "4. POST crear (201)",
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nombre\": \"Hollow Knight\",\n  \"genero\": \"Metroidvania\",\n  \"plataforma\": \"PC\",\n  \"precio\": 14.99,\n  \"disponible\": true\n}"
+                                              },
+                                     "url":  "{{base_url}}/videojuegos",
+                                     "description":  "Registra un videojuego nuevo (el id se genera solo). Esperado: **201 Created**. Con un `id` repetido: 409; con datos inválidos: 422."
+                                 }
+                 },
+                 {
+                     "name":  "5. PUT actualizar (200)",
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"nombre\": \"Hollow Knight\",\n  \"genero\": \"Metroidvania\",\n  \"plataforma\": \"Nintendo Switch\",\n  \"precio\": 9.99,\n  \"disponible\": false\n}"
+                                              },
+                                     "url":  "{{base_url}}/videojuegos/4",
+                                     "description":  "Reemplaza todos los campos del videojuego con id 4 (créalo antes con el POST). Esperado: **200 OK**."
+                                 }
+                 },
+                 {
+                     "name":  "6. DELETE eliminar (204)",
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  "{{base_url}}/videojuegos/4",
+                                     "description":  "Elimina el videojuego con id 4. Esperado: **204 No Content**, sin cuerpo. Repetirlo da 404."
+                                 }
+                 }
+             ]
+}

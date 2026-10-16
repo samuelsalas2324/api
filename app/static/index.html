@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GameCatalog</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand"><span class="brand-logo">🎮</span><span>GameCatalog</span></div>
+      <div class="topbar-actions">
+        <a class="btn btn-ghost hide-sm" href="/docs" target="_blank" rel="noopener">API /docs</a>
+        <button class="btn btn-ghost icon" id="themeBtn" type="button" aria-label="Cambiar tema" title="Cambiar tema">🌙</button>
+        <button class="btn btn-primary" id="newBtn" type="button">+ <span class="hide-xs">Nuevo videojuego</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Tu catálogo de <span class="grad">videojuegos</span></h1>
+      <p>Datos en vivo desde la API de FastAPI: consulta, registra, edita y elimina.</p>
+      <div class="stats" id="stats" aria-live="polite"></div>
+    </section>
+
+    <section class="filters" aria-label="Filtros">
+      <label class="field grow">
+        <span class="sr">Buscar por nombre</span>
+        <input type="search" id="q" placeholder="🔍 Buscar por nombre…" autocomplete="off">
+      </label>
+      <label class="field"><span class="sr">Género</span>
+        <select id="fGenero"><option value="">Todos los géneros</option></select></label>
+      <label class="field"><span class="sr">Plataforma</span>
+        <select id="fPlataforma"><option value="">Todas las plataformas</option></select></label>
+      <label class="field"><span class="sr">Disponibilidad</span>
+        <select id="fDisp">
+          <option value="">Toda disponibilidad</option>
+          <option value="1">Disponibles</option>
+          <option value="0">No disponibles</option>
+        </select></label>
+      <button class="btn btn-ghost" id="clearBtn" type="button">Limpiar</button>
+    </section>
+
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div id="state" class="state" hidden></div>
+  </main>
+
+  <!-- Formulario crear / editar -->
+  <dialog id="formDlg">
+    <form id="form" method="dialog" novalidate>
+      <h2 id="formTitle">Nuevo videojuego</h2>
+      <label class="lbl" id="idRow">ID (opcional)
+        <input type="number" id="fId" min="1" step="1" placeholder="Se genera automáticamente">
+      </label>
+      <label class="lbl">Nombre
+        <input type="text" id="fNombre" required maxlength="100" placeholder="Ej. Hollow Knight">
+      </label>
+      <div class="row2">
+        <label class="lbl">Género
+          <input type="text" id="fGen" required maxlength="50" list="dlGeneros" placeholder="Ej. Aventura">
+          <datalist id="dlGeneros"></datalist>
+        </label>
+        <label class="lbl">Plataforma
+          <input type="text" id="fPlat" required maxlength="50" list="dlPlataformas" placeholder="Ej. PC">
+          <datalist id="dlPlataformas"></datalist>
+        </label>
+      </div>
+      <div class="row2">
+        <label class="lbl">Precio (USD)
+          <input type="number" id="fPrecio" required min="0" step="0.01" placeholder="0.00">
+        </label>
+        <label class="lbl switch-row">Disponible
+          <span class="switch"><input type="checkbox" id="fDispon" checked><i></i></span>
+        </label>
+      </div>
+      <p class="form-error" id="formError" role="alert" hidden></p>
+      <div class="dlg-actions">
+        <button class="btn btn-ghost" type="button" id="cancelBtn">Cancelar</button>
+        <button class="btn btn-primary" type="submit" id="saveBtn">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmación de eliminación -->
+  <dialog id="delDlg">
+    <h2>¿Eliminar videojuego?</h2>
+    <p id="delText"></p>
+    <div class="dlg-actions">
+      <button class="btn btn-ghost" type="button" id="delCancel">Cancelar</button>
+      <button class="btn btn-danger" type="button" id="delOk">Sí, eliminar</button>
+    </div>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
