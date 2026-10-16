@@ -2,6 +2,8 @@
 
 API REST con FastAPI para gestionar un catálogo de videojuegos (almacenamiento en memoria).
 
+# Enlace a Landing API desplegaga: https://gamecatalog-api.vercel.app/ui/
+
 ## 1. Estructura
 
 ```
